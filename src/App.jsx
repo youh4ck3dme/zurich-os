@@ -19,8 +19,6 @@ import Screensaver from './components/Screensaver';
 import maseratiImage from './assets/images/maserati_mc20.png';
 import zurichTrident from './assets/images/zurich_trident.png';
 
-// --- ASSETS ---
-import maseratiImage from './assets/images/maserati_mc20.png';
 
 // --- ELITE COMPONENTS ---
 
