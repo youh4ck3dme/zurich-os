@@ -72,6 +72,30 @@ const AuthScreen = ({ onFingerSuccess, mode = 'fingerprint' }) => {
       <div className="system-100vh flex flex-col items-center justify-center bg-onyx relative overflow-hidden px-8">
         <div className="absolute inset-0 bg-gradient-to-b from-red-900/5 to-transparent pointer-events-none" />
         
+        {/* Ambient Tactical Particles */}
+        <div className="absolute inset-0 pointer-events-none opacity-20">
+          {[...Array(15)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute w-[1px] h-[1px] bg-white rounded-full"
+              initial={{ 
+                x: Math.random() * window.innerWidth, 
+                y: Math.random() * window.innerHeight,
+                opacity: Math.random()
+              }}
+              animate={{
+                y: [null, -100],
+                opacity: [null, 0]
+              }}
+              transition={{
+                duration: 5 + Math.random() * 5,
+                repeat: Infinity,
+                ease: "linear"
+              }}
+            />
+          ))}
+        </div>
+        
         {/* Central Biometric Interface */}
         <div className="relative group flex items-center justify-center mb-24">
           <div className={`
@@ -93,19 +117,29 @@ const AuthScreen = ({ onFingerSuccess, mode = 'fingerprint' }) => {
               shadow-[0_0_80px_rgba(0,0,0,0.8)]
             `}
           >
-            <Fingerprint 
-              size={64} 
-              strokeWidth={0.5} 
-              className={`transition-all duration-700 ${scanning ? 'text-red-500 drop-shadow-[0_0_15px_rgba(239,68,68,0.6)]' : 'text-white/20'}`} 
-            />
+            <motion.div
+              animate={scanning ? {} : { 
+                scale: [1, 1.1, 1],
+                opacity: [0.2, 0.4, 0.2]
+              }}
+              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+            >
+              <Fingerprint 
+                size={64} 
+                strokeWidth={0.5} 
+                className={`transition-all duration-700 ${scanning ? 'text-red-500 drop-shadow-[0_0_15px_rgba(239,68,68,0.6)]' : 'text-white/20'}`} 
+              />
+            </motion.div>
           </button>
 
-          {/* Progress Spinner */}
-          <svg className="absolute -inset-6 w-[calc(100%+48px)] h-[calc(100%+48px)] -rotate-90 pointer-events-none">
+          {/* Progress Spinner with Glow */}
+          <svg className="absolute -inset-6 w-[calc(100%+48px)] h-[calc(100%+48px)] -rotate-90 pointer-events-none filter drop-shadow-[0_0_8px_rgba(239,68,68,0.3)]">
             <circle cx="100" cy="100" r="92" fill="none" stroke="rgba(255,255,255,0.02)" strokeWidth="1" />
             <motion.circle 
               cx="100" cy="100" r="92" 
-              fill="none" stroke={scanning ? "rgb(239, 68, 68)" : "white"} strokeWidth="2" 
+              fill="none" 
+              stroke={scanning ? "rgb(239, 68, 68)" : "rgba(255,255,255,0.1)"} 
+              strokeWidth="2" 
               strokeDasharray="578"
               strokeDashoffset={578 - (578 * progress) / 100}
               className="gauge-ring"
@@ -140,10 +174,11 @@ const AuthScreen = ({ onFingerSuccess, mode = 'fingerprint' }) => {
         <ScanFace size={100} strokeWidth={0.2} className="text-white/10" />
         
         <motion.div 
-          animate={{ top: ['0%', '100%', '0%'] }}
-          transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute inset-x-0 h-px bg-white/40 z-20 shadow-[0_0_15px_white]"
+          animate={{ top: ['-10%', '110%'] }}
+          transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+          className="absolute inset-x-0 h-[2px] bg-white/20 z-20 shadow-[0_0_15px_white] opacity-30"
         />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,black_80%)] opacity-40" />
       </div>
       
       <div className="mt-16 flex flex-col items-center">
