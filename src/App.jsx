@@ -13,6 +13,11 @@ import GarageScreen from './components/GarageScreen';
 import ExecutiveIgnition from './components/ExecutiveIgnition';
 import RadarScreen from './components/RadarScreen';
 import VaultScreen from './components/VaultScreen';
+import Screensaver from './components/Screensaver';
+
+// --- ASSETS ---
+import maseratiImage from './assets/images/maserati_mc20.png';
+import zurichTrident from './assets/images/zurich_trident.png';
 
 // --- ASSETS ---
 import maseratiImage from './assets/images/maserati_mc20.png';
@@ -70,6 +75,7 @@ export default function App() {
   const [isStarting, setIsStarting] = useState(false);
   const [engineReady, setEngineReady] = useState(false);
   const [showDossier, setShowDossier] = useState(false);
+  const [showScreensaver, setShowScreensaver] = useState(false);
 
   const inactivityTimer = useRef(null);
   const performance = usePerformance(engineReady);
@@ -80,12 +86,16 @@ export default function App() {
     }
   }, [screen]);
 
-  // Inactivity Logic (30 Seconds)
+  // Inactivity Logic (29 Seconds for Screensaver)
   useEffect(() => {
     const handleActivity = () => {
       if (inactivityTimer.current) clearTimeout(inactivityTimer.current);
-      if (screen !== 'boot' && screen !== 'fingerprint') {
-        inactivityTimer.current = setTimeout(lockDevice, 30000);
+      if (showScreensaver) setShowScreensaver(false);
+      
+      if (screen !== 'boot') {
+        inactivityTimer.current = setTimeout(() => {
+          if (screen !== 'boot') setShowScreensaver(true);
+        }, 29000);
       }
     };
 
@@ -94,7 +104,7 @@ export default function App() {
     window.addEventListener('touchstart', handleActivity);
     window.addEventListener('keydown', handleActivity);
 
-    handleActivity(); // Initial start
+    handleActivity();
 
     return () => {
       window.removeEventListener('mousemove', handleActivity);
@@ -150,10 +160,10 @@ export default function App() {
             <BootScreen key="boot" onComplete={() => { setWasBooted(true); setScreen('fingerprint'); }} />
           )}
           {screen === 'fingerprint' && (
-            <AuthScreen 
-              key="finger" 
-              mode="fingerprint" 
-              onFingerSuccess={() => setScreen(wasBooted ? 'radar' : 'garage')} 
+            <AuthScreen
+              key="finger"
+              mode="fingerprint"
+              onFingerSuccess={() => setScreen(wasBooted ? 'radar' : 'garage')}
             />
           )}
           {screen === 'garage' && (
@@ -201,6 +211,16 @@ export default function App() {
         </AnimatePresence>
 
         <AnimatePresence>
+          {showScreensaver && (
+            <Screensaver 
+              key="screensaver" 
+              logo={zurichTrident} 
+              onInteraction={() => {
+                setShowScreensaver(false);
+                if (screen !== 'fingerprint') setScreen('fingerprint');
+              }} 
+            />
+          )}
           {showDossier && (
             <DossierCard
               car={cars[selectedCar]}
