@@ -16,8 +16,8 @@ const NeonSnake = ({ isActive, scanning }) => (
           top: '50%',
           transform: 'translate(-50%, -50%)',
           background: scanning 
-            ? 'radial-gradient(circle, #ff4500 0%, transparent 70%)' 
-            : 'radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%)',
+            ? 'radial-gradient(circle, rgba(239, 68, 68, 0.4) 0%, transparent 70%)' 
+            : 'radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, transparent 70%)',
           filter: 'blur(8px)',
         }}
         animate={{
@@ -40,6 +40,25 @@ const NeonSnake = ({ isActive, scanning }) => (
     />
   </div>
 );
+
+// Hardcoded tactical particles for background (deterministic to satisfy strict purity rules)
+const STABLE_PARTICLES = [
+  { id: 0, x: 12, y: 45, opacity: 0.3, duration: 8 },
+  { id: 1, x: 88, y: 12, opacity: 0.2, duration: 12 },
+  { id: 2, x: 34, y: 78, opacity: 0.4, duration: 7 },
+  { id: 3, x: 67, y: 23, opacity: 0.1, duration: 15 },
+  { id: 4, x: 45, y: 56, opacity: 0.3, duration: 10 },
+  { id: 5, x: 21, y: 90, opacity: 0.2, duration: 9 },
+  { id: 6, x: 76, y: 34, opacity: 0.4, duration: 11 },
+  { id: 7, x: 92, y: 67, opacity: 0.1, duration: 14 },
+  { id: 8, x: 5, y: 15, opacity: 0.3, duration: 6 },
+  { id: 9, x: 50, y: 85, opacity: 0.2, duration: 13 },
+  { id: 10, x: 15, y: 60, opacity: 0.4, duration: 8 },
+  { id: 11, x: 80, y: 40, opacity: 0.1, duration: 12 },
+  { id: 12, x: 60, y: 10, opacity: 0.3, duration: 9 },
+  { id: 13, x: 30, y: 30, opacity: 0.2, duration: 11 },
+  { id: 14, x: 70, y: 70, opacity: 0.4, duration: 7 }
+];
 
 const AuthScreen = ({ onFingerSuccess, mode = 'fingerprint' }) => {
   const [scanning, setScanning] = useState(false);
@@ -73,22 +92,22 @@ const AuthScreen = ({ onFingerSuccess, mode = 'fingerprint' }) => {
         <div className="absolute inset-0 bg-gradient-to-b from-red-900/5 to-transparent pointer-events-none" />
         
         {/* Ambient Tactical Particles */}
-        <div className="absolute inset-0 pointer-events-none opacity-20">
-          {[...Array(15)].map((_, i) => (
+        <div className="absolute inset-0 pointer-events-none opacity-20 overflow-hidden">
+          {STABLE_PARTICLES.map((p) => (
             <motion.div
-              key={i}
-              className="absolute w-[1px] h-[1px] bg-white rounded-full"
+              key={p.id}
+              className="absolute w-[1.5px] h-[1.5px] bg-white rounded-full"
               initial={{ 
-                x: Math.random() * window.innerWidth, 
-                y: Math.random() * window.innerHeight,
-                opacity: Math.random()
+                left: `${p.x}%`, 
+                top: `${p.y}%`,
+                opacity: p.opacity
               }}
               animate={{
-                y: [null, -100],
-                opacity: [null, 0]
+                y: [0, -150],
+                opacity: [p.opacity, 0]
               }}
               transition={{
-                duration: 5 + Math.random() * 5,
+                duration: p.duration,
                 repeat: Infinity,
                 ease: "linear"
               }}
@@ -100,7 +119,7 @@ const AuthScreen = ({ onFingerSuccess, mode = 'fingerprint' }) => {
         <div className="relative group flex items-center justify-center mb-24">
           <div className={`
             absolute -inset-24 rounded-full blur-3xl transition-opacity duration-1000
-            ${scanning ? 'bg-red-500/10 opacity-100 animate-pulse' : 'bg-white/2 opacity-20'}
+            ${scanning ? 'bg-red-500/20 opacity-100 animate-pulse' : 'bg-white/5 opacity-20'}
           `} />
           
           <NeonSnake isActive={true} scanning={scanning} />
@@ -133,7 +152,10 @@ const AuthScreen = ({ onFingerSuccess, mode = 'fingerprint' }) => {
           </button>
 
           {/* Progress Spinner with Glow */}
-          <svg className="absolute -inset-6 w-[calc(100%+48px)] h-[calc(100%+48px)] -rotate-90 pointer-events-none filter drop-shadow-[0_0_8px_rgba(239,68,68,0.3)]">
+          <svg 
+            viewBox="0 0 200 200"
+            className={`absolute -inset-6 w-[calc(100%+48px)] h-[calc(100%+48px)] -rotate-90 pointer-events-none filter transition-all duration-500 ${scanning ? 'drop-shadow-[0_0_12px_rgba(239,68,68,0.5)]' : 'drop-shadow-none'}`}
+          >
             <circle cx="100" cy="100" r="92" fill="none" stroke="rgba(255,255,255,0.02)" strokeWidth="1" />
             <motion.circle 
               cx="100" cy="100" r="92" 
@@ -146,6 +168,19 @@ const AuthScreen = ({ onFingerSuccess, mode = 'fingerprint' }) => {
               transition={{ ease: "linear" }}
             />
           </svg>
+
+          {/* Scanning Line (20% Extra transitions) */}
+          <AnimatePresence>
+            {scanning && (
+              <motion.div
+                initial={{ top: '20%', opacity: 0 }}
+                animate={{ top: ['20%', '80%', '20%'], opacity: 0.5 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                className="absolute left-1/2 -translate-x-1/2 w-32 h-[1px] bg-red-500/60 z-20 shadow-[0_0_15px_rgba(239,68,68,0.8)]"
+              />
+            )}
+          </AnimatePresence>
         </div>
 
         {/* Identity Text (Moved to Bottom, Centered) */}
