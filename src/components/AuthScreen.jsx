@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 /* eslint-disable no-unused-vars */
 import { motion, AnimatePresence } from 'framer-motion';
 import { Lock, Fingerprint, ScanFace, Activity, Shield } from 'lucide-react';
+import { playClickSound, playAuthSuccessSound } from '../utils/engineAudio';
 
 // Neon Snake Component (Refined for background orbital glow)
 const NeonSnake = ({ isActive, scanning }) => (
@@ -67,11 +68,13 @@ const AuthScreen = ({ onFingerSuccess, mode = 'fingerprint' }) => {
 
   const startScan = () => {
     setScanning(true);
+    playClickSound();
     if (navigator.vibrate) navigator.vibrate(50);
     timerRef.current = setInterval(() => {
       setProgress(prev => {
         if (prev >= 100) {
           if (timerRef.current) clearInterval(timerRef.current);
+          playAuthSuccessSound();
           onFingerSuccess();
           return 100;
         }

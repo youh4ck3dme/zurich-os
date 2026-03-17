@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Power } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { playStarterSound, playIgnitionSound } from '../utils/engineAudio';
 
 const ExecutiveIgnition = ({ car, onStart, onStartInitiated, ready, performance }) => {
   const [starting, setStarting] = useState(false);
@@ -12,9 +13,8 @@ const ExecutiveIgnition = ({ car, onStart, onStartInitiated, ready, performance 
     setStarting(true);
     if (onStartInitiated) onStartInitiated();
 
-    // 1. Audio Sequence (Standardized paths)
-    const soundStarter = new Audio('/audio/mc20_starter.mp3');
-    const soundIgnition = new Audio('/audio/mc20_ignite.mp3');
+    // 1. Synthesized Audio Sequence (Web Audio API — no external files needed)
+    playStarterSound();
 
     // 2. Haptic Protocol (Maserati Cylinder Simulation)
     if (navigator.vibrate) {
@@ -22,10 +22,8 @@ const ExecutiveIgnition = ({ car, onStart, onStartInitiated, ready, performance 
       navigator.vibrate([50, 30, 50, 30, 50, 30, 200]);
     }
 
-    soundStarter.play().catch(() => {});
-
     setTimeout(() => {
-      soundIgnition.play().catch(() => {});
+      playIgnitionSound();
       // Triggers parent state change
       onStart();
     }, 500);
