@@ -149,7 +149,8 @@ export default function App() {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className={`fixed inset-0 bg-onyx text-alpine font-sans system-100vh ${isStarting ? 'engine-vibration' : ''}`}
+      onContextMenu={(e) => e.preventDefault()}
+      className={`fixed inset-0 bg-onyx text-alpine font-sans system-100vh select-none touch-none ${isStarting ? 'engine-vibration' : ''}`}
     >
       <div className="noise-overlay" />
       <div className="w-full h-full relative z-10">
